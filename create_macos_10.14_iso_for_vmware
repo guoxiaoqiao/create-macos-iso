@@ -16,7 +16,7 @@ rm /tmp/Mojave.sparseimage &> /dev/null
 
 # 计算要最终镜像的大小
 APP_SIZE=$(du -hsm "$APP_PATH" | awk -F ' ' '{print $1}')
-TOTAL_SIZE=`expr $APP_SIZE + 1200`m
+TOTAL_SIZE=`expr $APP_SIZE + 1210`m
 
 # Create the Mojave Blank ISO Image with a Single Partition - Apple Partition Map
 hdiutil create -o /tmp/Mojave -size $TOTAL_SIZE -layout SPUD -fs HFS+J -type SPARSE
@@ -28,7 +28,7 @@ hdiutil attach /tmp/Mojave.sparseimage -noverify -nobrowse -mountpoint /Volumes/
 asr restore -source "$DMG_PATH/BaseSystem.dmg" -target /Volumes/install_build -noprompt -noverify -erase
 
 # 更改磁盘名称与当前版本相关
-VERSION=$(sed -n -e 's/.*<string>\(.*\)<\/string>.*/\1/p' /Volumes/OS\ X\ Base\ System/System/Library/CoreServices/SystemVersion.plist | tail -n 1)
+VERSION=$(grep -A 1 ProductUserVisibleVersion '/Volumes/OS X Base System/System/Library/CoreServices/SystemVersion.plist' | sed -n -e 's/.*<string>\(.*\)<\/string>.*/\1/p')
 VOLUME_NAME="macOS $VERSION Install"
 hdiutil detach /Volumes/"$VOLUME_NAME" &> /dev/null
 diskutil rename "OS X Base System" "$VOLUME_NAME"
